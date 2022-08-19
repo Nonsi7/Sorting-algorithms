@@ -1,72 +1,76 @@
 #include "sort.h"
-/**
-*integer_count- number of times integer appears in an array
-*
-*@array: array given
-*@size: size of array
-*@range: number to check for occurance
-*
-*Return: number of occurances
-*/
-int integer_count(int *array, size_t size, int range)
-{
-	int total = 0;
-	size_t i;
 
-	for (i = 0; i < size; i++)
+/**
+* findmax - Finds the maximum value in an array
+* @array: array to find max value of
+* @size: Size of array
+* Return: Largest value
+*/
+
+int findmax(int *array, size_t size)
+{
+	int i, max = 0;
+
+	for (i = 0; i < (int)size; i++)
 	{
-		if (array[i] == range)
-			total++;
+		if (max < array[i])
+			max = array[i];
 	}
-	return (total);
+	return (max);
 }
 
 /**
-*counting_sort - counting sort algorithm
-*
-*@array: array to be sorted
-*@size: size of the array
+* count - Counts number of occurences of value in an array
+* @array: Array to count values of
+* @size: Size of array
+* @val: Value to count in the array
+* Return: Count of va
 */
+
+int count(int *array, size_t size, int val)
+{
+	int c = 0, i;
+
+	for (i = 0; i < (int)size; i++)
+	{
+		if (array[i] == val)
+			c++;
+	}
+	return (c);
+}
+
+/**
+* counting_sort - sorts array using counting algorithm
+* @array: Array to sort
+* @size: Size of array
+*/
+
 void counting_sort(int *array, size_t size)
 {
-	int k = 0, b = 0, r = 0;
-	size_t i, c;
-	int *array2, *newArray;
+	int max, *ca, i, *out, j;
 
-	if (!array || size < 2)
+	if (array == NULL || size < 2)
 		return;
-	for (i = 0; i < size; i++)
-	{
-		if (array[i] > k)
-		{
-			k = array[i];
-		}
-	}
-	array2 = malloc(sizeof(int) * (k + 1));
-	if (!array2)
+	max = findmax(array, size);
+	out = malloc(sizeof(int) * (int)size);
+	ca = malloc(sizeof(int) * (max + 1));
+	if (ca == NULL || out == NULL)
 		return;
-	for (c = 0; c < ((size_t)k + 1); c++)
+	for (i = j = 0; i < max + 1; i++)
 	{
-		if (c == 0)
-			array2[c] = integer_count(array, size, r);
-		else
-		{
-			b = array2[c - 1] + integer_count(array, size, r);
-			array2[c] = b;
-		}
-		r++;
+		j += count(array, size, i);
+		ca[i] = j;
 	}
-	print_array(array2, (k + 1));
-	newArray = malloc(sizeof(int) * size);
-	if (!newArray)
+	print_array(ca, max + 1);
+	for (i = 0; i < (int)size; i++)
 	{
-		free(array2);
-		return;
+		out[ca[array[i]] - 1] = array[i];
+		ca[array[i]] -= 1;
 	}
-	for (i = 0; i < size; i++)
-		newArray[array2[array[i]]-- - 1] = array[i];
-	for (i = 0; i < size; i++)
-		array[i] = newArray[i];
-	free(newArray);
-	free(array2);
+	for (i = 0; i < (int)size; i++)
+		array[i] = out[i];
+
+	free(out);
+	free(ca);
 }
+
