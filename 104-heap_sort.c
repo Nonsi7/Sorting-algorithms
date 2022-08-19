@@ -1,93 +1,51 @@
 #include "sort.h"
-#define parent(x) (((x) - 1) / 2)
-#define leftchild(x) (((x) * 2) + 1)
 
 /**
- * swap - swaps 2 int values
- * @array: the integer array to sort
- * @size: the size of the array
- * @a: address of first value
- * @b: address of second value
- *
- * Return: void
- */
-void swap(int *array, size_t size, int *a, int *b)
-{
-	if (*a != *b)
-	{
-		*a = *a + *b;
-		*b = *a - *b;
-		*a = *a - *b;
-	}
-	print_array((const int *)array, size);
-}
-
-/**
-*siftdown - siftdown implementation
-*
-*@array: array to be sorted
-*@start: start of array
-*@end: end of array
-*@size: size of array
-*
+* stupify - recurrssive heapfiy function
+* @array: Array to sort
+* @heap: size of heap data
+* @i: index
+* @size: size of array
 */
-void siftdown(int *array, size_t start, size_t end, size_t size)
-{
-	size_t root = start, _swap, child;
 
-	while (leftchild(root) <= end)
+void stupify(int *array, int heap, int i, int size)
+{
+	int lar = i, left = 2 * i + 1, right = 2 * i + 2, t;
+
+	if (left < heap && array[left] > array[lar])
+		lar = left;
+	if (right < heap && array[right] > array[lar])
+		lar = right;
+	if (lar != i)
 	{
-		child = leftchild(root);
-		_swap = root;
-		if (array[_swap] < array[child])
-			_swap = child;
-		if (child + 1 <= end &&
-			array[_swap] < array[child + 1])
-			_swap = child + 1;
-		if (_swap == root)
-			return;
-		swap(array, size, &array[root], &array[_swap]);
-		root = _swap;
+		t = array[i], array[i] = array[lar], array[lar] = t;
+		print_array(array, size);
+		stupify(array, heap, lar, size);
 	}
 }
 
 /**
-*heapify - makes heap in-place
-*
-*@array: array to be sorted
-*@size: size of array
-*
+* heap_sort - Sorts array with heap sort algo
+* @array: array to sort
+* @size: Size of array to sort
 */
-void heapify(int *array, size_t size)
-{
-	ssize_t start;
 
-	start = parent(size - 1);
-	while (start >= 0)
-	{
-		siftdown(array, start, size - 1, size);
-		start--;
-	}
-}
-/**
-*heap_sort - heap sort algorithm
-*
-*@array: array to sort
-*@size: size of array
-*
-*/
 void heap_sort(int *array, size_t size)
 {
-	size_t end;
+	int i = size / 2 - 1, temp;
 
-	if (!array || size < 2)
+	if (array == NULL || size < 2)
 		return;
-	heapify(array, size);
-	end = size - 1;
-	while (end > 0)
+	for (; i >= 0; i--)
+		stupify(array, size, i, size);
+	for (i = size - 1; i >= 0; i--)
 	{
-		swap(array, size, &array[end], &array[0]);
-		end--;
-		siftdown(array, 0, end, size);
+		temp = array[0];
+		array[0] = array[i];
+		array[i] = temp;
+		if (i > 0)
+			print_array(array, size);
+		stupify(array, i, 0, size);
 	}
+
 }

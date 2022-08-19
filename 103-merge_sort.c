@@ -1,83 +1,84 @@
 #include "sort.h"
 
 /**
- * merge_compare - compares merges
- * @array: the integer array to sort
- * @start: the start index
- * @stop: the stop index
- * @new: the output array
- *
- * Return: void.
- */
-void merge_compare(int *array, size_t start, size_t stop, int *new)
-{
-	size_t i = start, j, k, mid;
+* merge - Merges the splits from merge_sorty
+* @array: Array split to merge
+* @low: lowest index of split
+* @middle: middle index of split
+* @high: high index of split
+* @temp: temp array for merging
+*/
 
-	j = mid = (start + stop) / 2;
+void merge(int *array, int low, int middle, int high, int *temp)
+{
+	int i, j, k, l = 0, r = 0, n, left[4096], right[4096];
+
 	printf("Merging...\n");
-	printf("[left]: ");
-	print_array(array + start, mid - start);
-	printf("[right]: ");
-	print_array(array + mid, stop - mid);
-	for (k = start; k < stop; k++)
-		if (i < mid && (j >= stop || array[i] <= array[j]))
-		{
-
-			new[k] = array[i++];
-		}
-		else
-		{
-			new[k] = array[j++];
-		}
-	printf("[Done]: ");
-	print_array(new + start, stop - start);
-}
-
-/**
- * merge_sort_top_down - sorts top-down recursively
- * @array: the integer array to sort
- * @start: the start index
- * @stop: the stop index
- * @new: the output array
- *
- * Return: void.
- */
-void merge_sort_top_down(int *array, size_t start, size_t stop, int *new)
-{
-	size_t mid;
-
-	mid = (start + stop) / 2;
-	if (stop - start < 2)
+	i = low, j = middle + 1, k = l = 0;
+	while (i <= middle && j <= high)
 	{
-		return;
+		if (array[i] <= array[j])
+			temp[k] = left[l] = array[i], k++, i++, l++;
+		else
+			temp[k] = right[r] = array[j], k++, j++, r++;
 	}
-	merge_sort_top_down(new, start, mid, array);
-	merge_sort_top_down(new, mid, stop, array);
-	merge_compare(new, start, stop, array);
+	while (i <= middle)
+		temp[k] = left[l] = array[i], k++, i++, l++;
+	while (j <= high)
+		temp[k] = right[r] = array[j], k++, j++, r++;
+	printf("[left]: ");
+	for (n = 0; n < l; n++)
+		(n == 0) ? printf("%d", left[n]) : printf(", %d", left[n]);
+	printf("\n[right]: ");
+	for (n = 0; n < r; n++)
+		(n == 0) ? printf("%d", right[n]) : printf(", %d", right[n]);
+	printf("\n[Done]: ");
+	for (i = low; i <= high; i++)
+	{
+		array[i] = temp[i - low], printf("%d", array[i]);
+		if (i != high)
+			printf(", ");
+		else
+			printf("\n");
+	}
 }
 
+/**
+* merge_sorty - recurrsive function utilizing merge sort algo
+* @array: Array
+* @low: Lowest index of split
+* @high: highest index of split
+* @temp: temp array for mergin
+*/
+
+void merge_sorty(int *array, int low, int high, int *temp)
+{
+	int middle;
+
+	if (low < high)
+	{
+		middle = ((high + low - 1) / 2);
+		merge_sorty(array, low, middle, temp);
+		merge_sorty(array, middle + 1, high, temp);
+		merge(array, low, middle, high, temp);
+	}
+}
 
 /**
- * merge_sort - sorts by merge sort algorithm
- * @array: the integer array to sort
- * @size: the size of the array
- *
- * Return: void.
- */
+* merge_sort - Sorts array with merge sort algo
+* @array: array to sort
+* @size: Size of array to sort
+*/
+
 void merge_sort(int *array, size_t size)
 {
-	int *new;
-	size_t i;
+	int *temp;
 
-
-	if (!array || size < 2)
+	if (array == NULL || size < 2)
 		return;
-
-	new = malloc(sizeof(int) * size);
-	if (!new)
+	temp = malloc(sizeof(int) * (size + 1));
+	if (temp == NULL)
 		return;
-	for (i = 0; i < size; i++)
-		new[i] = array[i];
-	merge_sort_top_down(array, 0, size, new);
-	free(new);
+	merge_sorty(array, 0, size - 1, temp);
+	free(temp);
 }
