@@ -73,4 +73,3 @@ void counting_sort(int *array, size_t size)
 	free(out);
 	free(ca);
 }
-
